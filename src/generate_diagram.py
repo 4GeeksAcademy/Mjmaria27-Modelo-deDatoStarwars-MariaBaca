@@ -1,10 +1,15 @@
 from sqlalchemy import create_engine
-from models import Base
+from models import db, User, Character, Planet, Favorite
 from eralchemy2 import render_er
+from flask import Flask
 
-# Crear DB en memoria
-engine = create_engine('sqlite:///:memory:')
-Base.metadata.create_all(engine)
+# Crear app temporal solo para generar el diagrama
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Generar el diagrama
-render_er(Base, 'diagram.png')
+db.init_app(app)
+
+with app.app_context():
+    db.create_all()
+    render_er(db.Model, 'diagram.png')
